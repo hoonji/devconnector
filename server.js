@@ -11,9 +11,9 @@ app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
 
 // Connect to MongoDB
-const db = require('./config/keys').mongoURI;
+const mongoURI = require('./config/keys').mongoURI;
 mongoose
-  .connect(db, {useNewUrlParser: true})
+  .connect(mongoURI, {useNewUrlParser: true})
   .then(() => console.log('MongoDB Connected'))
   .catch(err => console.log(err));
 
@@ -25,5 +25,4 @@ app.use('/api/profile', profile);
 app.use('/api/posts', posts);
 
 const port = process.env.PORT || 5001;
-
 app.listen(port, () => console.log(`Server running on port ${port}`));
