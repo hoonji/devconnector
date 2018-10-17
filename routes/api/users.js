@@ -84,7 +84,7 @@ router.post('/login', async (req, res) => {
       token: `Bearer ${token}`
     });
   } else {
-    return res.status(400).json({ password: 'Passowrd incorrect' });
+    return res.status(400).json({ password: 'Password incorrect' });
   }
 });
 

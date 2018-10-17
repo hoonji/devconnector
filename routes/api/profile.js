@@ -3,6 +3,8 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const passport = require('passport');
 
+const validateProfileInput = require('../../validation/profile');
+
 const Profile = require('../../models/Profile');
 const User = require('../../models/User');
 
@@ -39,7 +41,11 @@ router.post(
   '/',
   passport.authenticate('jwt', { session: false }),
   (req, res) => {
-    const errors = {};
+    const { errors, isValid } = validateProfileInput(req.body);
+
+    if (!isValid) {
+      return res.status(400).json(errors);
+    }
 
     const profileFields = {};
     profileFields.user = req.user.id;
@@ -60,6 +66,7 @@ router.post(
     if (req.body.facebook) profileFields.social.facebook = req.body.facebook;
     if (req.body.linkedin) profileFields.social.linkedin = req.body.linkedin;
     if (req.body.instagram) profileFields.social.instagram = req.body.instagram;
+    profileFields.test = undefined;
 
     Profile.findOne({ user: req.user.id }).then(profile => {
       if (profile) {
