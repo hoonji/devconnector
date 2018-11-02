@@ -44,8 +44,8 @@ router.post('/register', async (req, res) => {
     avatar: gravatar.url(req.body.email, {
       s: '200',
       r: 'pg',
-      d: 'mm'
-    })
+      d: 'mm',
+    }),
   });
 
   try {
@@ -66,11 +66,12 @@ router.post('/login', async (req, res) => {
     return res.status(400).json(errors);
   }
 
+  // check if user exists
   const { email, password } = req.body;
-
   const user = await User.findOne({ email });
   if (!user) return res.status(404).json({ email: 'User not found' });
 
+  // check password
   const isMatch = await bcrypt.compare(password, user.password);
   if (isMatch) {
     // User matched
@@ -81,7 +82,7 @@ router.post('/login', async (req, res) => {
     const token = jwt.sign(payload, keys.secretOrKey, { expiresIn: 3600 });
     res.json({
       success: true,
-      token: `Bearer ${token}`
+      token: `Bearer ${token}`,
     });
   } else {
     return res.status(400).json({ password: 'Password incorrect' });
@@ -99,9 +100,9 @@ router.get(
     res.json({
       id,
       name,
-      email
+      email,
     });
-  }
+  },
 );
 
 module.exports = router;

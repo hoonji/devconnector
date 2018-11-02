@@ -21,7 +21,7 @@ const mongoURI = require('./config/keys').mongoURI;
 mongoose
   .connect(
     mongoURI,
-    { useNewUrlParser: true }
+    { useNewUrlParser: true },
   )
   .then(() => console.log('MongoDB Connected'))
   .catch(err => console.log(err));
@@ -30,6 +30,10 @@ mongoose
 app.use('/api/users', users);
 app.use('/api/profile', profile);
 app.use('/api/posts', posts);
+
+app.get('/test', (req, res) => {
+  res.status(400).send({ an: 'object' });
+});
 
 const port = process.env.PORT || 5001;
 app.listen(port, () => console.log(`Server running on port ${port}`));
