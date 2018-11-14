@@ -6,8 +6,8 @@ module.exports = data => {
 
   Object.keys(data).forEach(attr => (data[attr] = data[attr] || ''));
 
-  ['handle', 'status', 'skills'].forEach(field => {
-    if (Validator.isEmpty(data[field])) {
+  [('handle', 'status', 'skills')].forEach(field => {
+    if (Validator.isEmpty(data[field] || '')) {
       errors[field] = `${field} field is required`;
     }
   });
