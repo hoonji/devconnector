@@ -107,10 +107,7 @@ router.post(
   (req, res) => {
     expSchema
       .validate(req.body)
-      .then(
-        _ => Profile.findOne({ user: req.user.id }),
-        err => res.send(err.errors),
-      )
+      .then(_ => Profile.findOne({ user: req.user.id }))
       .then(profile => {
         const newExp = filterByKeys(req.body, [
           'title',
@@ -125,7 +122,44 @@ router.post(
         profile.experience.unshift(newExp);
         profile.save().then(profile => res.json(profile));
       })
-      .catch(err => res.json(err));
+      .catch(err => console.log(err) || res.json(err));
+  },
+);
+
+// @route   POST api/profile/education
+// @desc    Add education to profile
+// @access  Private
+const eduSchema = yup.object().shape({
+  school: yup.string().required(),
+  degree: yup.string().required(),
+  fieldofstudy: yup.string().required(),
+  from: yup.date().required(),
+  to: yup.date(),
+  current: yup.boolean(),
+  description: yup.string(),
+});
+router.post(
+  '/education',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    eduSchema
+      .validate(req.body, { abortEarly: false })
+      .then(_ => Profile.findOne({ user: req.user.id }))
+      .then(profile => {
+        const newEdu = filterByKeys(req.body, [
+          'school',
+          'degree',
+          'fieldofstudy',
+          'from',
+          'to',
+          'current',
+          'description',
+        ]);
+
+        profile.education.unshift(newEdu);
+        profile.save().then(profile => res.json(profile));
+      })
+      .catch(err => res.json(err.errors || err));
   },
 );
 
