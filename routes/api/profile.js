@@ -97,7 +97,7 @@ const expSchema = yup.object().shape({
   company: yup.string().required(),
   location: yup.string().required(),
   from: yup.date().required(),
-  to: yup.date().required(),
+  to: yup.date(),
   current: yup.boolean(),
   description: yup.string(),
 });
@@ -123,6 +123,25 @@ router.post(
         profile.save().then(profile => res.json(profile));
       })
       .catch(err => console.log(err) || res.json(err));
+  },
+);
+
+// @route   DELETE api/profile/experience
+// @desc    Delete experience
+// @access  Private
+router.delete(
+  '/experience/:id',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    Profile.findOne({ user: req.user.id })
+      .then(profile => {
+        profile.experience = profile.experience.filter(
+          exp => exp.id !== req.params.id,
+        );
+        return profile.save();
+      })
+      .then(result => res.send(result))
+      .catch(err => res.send(err));
   },
 );
 
@@ -160,6 +179,39 @@ router.post(
         profile.save().then(profile => res.json(profile));
       })
       .catch(err => res.json(err.errors || err));
+  },
+);
+
+// @route   DELETE api/profile/education
+// @desc    Delete education
+// @access  Private
+router.delete(
+  '/education/:id',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    Profile.findOne({ user: req.user.id })
+      .then(profile => {
+        profile.education = profile.education.filter(
+          edu => edu.id !== req.params.id,
+        );
+        return profile.save();
+      })
+      .then(result => res.send(result))
+      .catch(err => res.send(err));
+  },
+);
+
+// @route   DELETE api/profile
+// @desc    Delete profile and user
+// @access  Private
+router.delete(
+  '/',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    Profile.findOneAndDelete({ user: req.user.id })
+      .then(_ => User.findOneByIdAndDelete(req.user.id))
+      .then(result => res.send(result))
+      .catch(err => res.send(err));
   },
 );
 
