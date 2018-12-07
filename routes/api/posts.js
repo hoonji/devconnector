@@ -51,6 +51,7 @@ router.delete(
   (req, res) => {
     Post.findById(req.params.id).then(post => {
       if (!post) return res.status(404).send('Not found');
+      console.log(post.user, req.user.id);
       if (post.user != req.user.id) return res.status(403).send('Unauthorized');
 
       post
@@ -58,6 +59,28 @@ router.delete(
         .then(result => res.send(result))
         .catch(e => res.send(e));
     });
+  },
+);
+
+// @route   POST api/posts/likes/:id
+// @desc    add a like to a post
+// @access  private
+router.post(
+  '/:id/likes',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    Post.findById(req.params.id)
+      .then(post => {
+        if (!post) return res.status(404).send();
+        if (
+          post.likes.filter(like => like.user.toString() === req.user.id).length
+        )
+          return res.status(400).send({ message: 'already liked' });
+
+        post.likes.push({ user: req.user.id });
+        post.save().then(post => res.send({ message: 'updated likes', post }));
+      })
+      .catch(e => res.status(500).send(e));
   },
 );
 
